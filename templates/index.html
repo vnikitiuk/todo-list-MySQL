@@ -1,5 +1,12 @@
-<!DOCTYPE html>
+{% extends "layout.html" %}
 
-<p>Hey you</p>
+{% block title %}
+    Index
+{% endblock %}
 
-{{ myvar }}
+{% block main %}
+    <p>Hey you</p>
+
+    {{ myvar }}
+
+{% endblock %}
