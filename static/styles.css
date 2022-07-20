@@ -1,6 +1,6 @@
  body {
     background-color: #E4E9FD;
-    background-image: -webkit-linear-gradient(65deg, #62488d52 50%, #E4E9FD 50%);
+    background-image: -webkit-linear-gradient(65deg, #8e50a199 50%, #E4E9FD 50%);
     min-height: 1000px;
   }
 
@@ -18,7 +18,7 @@
   }
 
   .navbar-nav{
-    color: #62488d52;
+    color: #8e50a199;
     font-size: 20px;
     padding-right: 2rem;
   }
@@ -37,7 +37,7 @@
   }
   
   #heading {
-    background-color: #62488d52;
+    background-color: #8e50a199;
     text-align: center;
   }
   
@@ -54,7 +54,7 @@
   
   input:checked+p {
     text-decoration: line-through;
-    text-decoration-color: #62488d52;
+    text-decoration-color: #8e50a199;
   }
   
   input[type="checkbox"] {
@@ -79,7 +79,7 @@
     width: 50px;
     border-radius: 50%;
     border-color: transparent;
-    background-color: #62488d52;
+    background-color: #8e50a199;
     color: #fff;
     font-size: 30px;
     padding-bottom: 6px;
@@ -87,10 +87,18 @@
   }
 
   .btn-primary {
-    background-color: #62488d52;
+    background-color: #8e50a199;
     min-height: 10%;
     width: 10%;
     border-color: #f8fafc;
+  }
+
+  #apology {
+    width: 40%;
+  }
+
+  .vh-100 {
+    height: 27rem!important;
   }
   
   input[type="text"].todo {
@@ -106,7 +114,7 @@
   
   input[type="text"]:focus.todo {
     outline: none;
-    box-shadow: inset 0 -3px 0 0 #62488d52;
+    box-shadow: inset 0 -3px 0 0 #8e50a199;
   }
   
   ::placeholder {

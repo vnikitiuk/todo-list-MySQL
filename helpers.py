@@ -10,9 +10,9 @@ def apology(message, code=400):
 
         https://github.com/jacebrowning/memegen#special-characters
         """
-        for old, new in [("-", "--"), (" ", "-"), ("_", "__"), ("?", "~q"),
-                         ("%", "~p"), ("#", "~h"), ("/", "~s"), ("\"", "''")]:
-            s = s.replace(old, new)
+        # for old, new in [("-", "--"), (" ", "-"), ("_", "__"), ("?", "~q"),
+        #                  ("%", "~p"), ("#", "~h"), ("/", "~s"), ("\"", "''")]:
+        #     s = s.replace(old, new)
         return s
     return render_template("apology.html", top=code, bottom=escape(message)), code
 
@@ -29,3 +29,19 @@ def login_required(f):
             return redirect("/login")
         return f(*args, **kwargs)
     return decorated_function
+
+
+def execute_select(db, sql, params=None):
+    mycursor = db.cursor(dictionary=True)
+    mycursor.execute(sql, params)
+    myvar = mycursor.fetchall()
+    db.commit()
+    mycursor.close()
+    return myvar
+
+
+def execute_insert_or_delete(db, sql, vals):
+    mycursor = db.cursor(dictionary=True)
+    mycursor.execute(sql, vals)
+    db.commit()
+    mycursor.close()

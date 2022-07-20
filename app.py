@@ -1,10 +1,7 @@
 import mysql.connector
 from flask import Flask, flash, redirect, render_template, request, session
-# from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
-
-from helpers import apology, login_required
-
+from helpers import apology, login_required, execute_insert_or_delete, execute_select
 # Configure application
 app = Flask(__name__)
 
@@ -20,35 +17,43 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # Connect to database
 mydb = mysql.connector.connect(
-  host="localhost",
-  user="todo_list",
-  password="0000",
-  database="todo_list"
+    host="localhost",
+    user="todo_list",
+    password="0000",
+    database="todo_list"
 )
 
 
-def execute_select(sql, params=None):
-    mycursor = mydb.cursor(dictionary=True)
-    mycursor.execute(sql, params)
-    myvar = mycursor.fetchall()
-    mydb.commit()
-    mycursor.close()
-    return myvar
-
-
-def execute_insert(sql, vals):
-    mycursor = mydb.cursor(dictionary=True)
-    mycursor.execute(sql, vals)
-    mydb.commit()
-    mycursor.close()
-
-
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-    todo_items = execute_select("SELECT * FROM todo_items WHERE user_id = %(user_id)s",  { 'user_id': session["user_id"] })
-    # user_name = execute_select("SELECT name FROM users WHERE id = %(id)s",  { 'id': session["user_id"] })
-    return render_template("index.html", todo_items=todo_items)
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        
+        new_item = request.form.get("newItem")
+        # Remember new todo item
+        if (len(new_item) > 0):
+            execute_insert_or_delete(mydb, "INSERT INTO todo_items (user_id, item) VALUES(%s, %s)", (session["user_id"], new_item))
+
+        return redirect("/")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        todo_items = execute_select(mydb, "SELECT * FROM todo_items WHERE user_id = %(user_id)s",  { 'user_id': session["user_id"] })
+        user_name = execute_select(mydb, "SELECT username FROM users WHERE id = %(id)s",  { 'id': session["user_id"] })[0]["username"]
+        return render_template("index.html", todo_items=todo_items, user_name=user_name)
+
+
+@app.route("/delete", methods=["POST"])
+@login_required
+def delete():
+
+    # User reached route via POST (as by submitting a form via POST)
+    execute_insert_or_delete(mydb, "DELETE FROM todo_items WHERE id = %(id)s", { 'id' : request.form.get("checkedOne") })
+
+    # Redirect user to home page
+    return redirect("/")
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -64,7 +69,7 @@ def register():
         # Ensure username was submitted
         name = request.form.get("username")
         if not name or len(execute_select("SELECT * FROM users WHERE username = %(username)s", { 'username': name })) > 0:
-            return apology("must provide username or such username exist", 400)
+            return apology("Must provide username or such username exist", 400)
 
         # Ensure password has 8 symbols
         password = request.form.get("password")
@@ -92,7 +97,7 @@ def register():
             return apology("Password must include numbers, lowercase and uppercase characters", 400)
 
         # Remember registrant
-        execute_insert("INSERT INTO users (username, hash) VALUES(%s, %s)", (name, generate_password_hash(password)))
+        execute_insert_or_delete(mydb, "INSERT INTO users (username, hash) VALUES(%s, %s)", (name, generate_password_hash(password)))
 
         # Redirect user to home page
         return redirect("/")
@@ -114,18 +119,18 @@ def login():
 
         # Ensure username was submitted
         if not request.form.get("username"):
-            return apology("must provide username", 403)
+            return apology("Must provide username", 403)
 
         # Ensure password was submitted
         elif not request.form.get("password"):
-            return apology("must provide password", 403)
+            return apology("Must provide password", 403)
 
         # Query database for username
-        rows = execute_select("SELECT * FROM users WHERE username = %(username)s", { 'username': request.form.get("username") })
+        rows = execute_select(mydb, "SELECT * FROM users WHERE username = %(username)s", { 'username': request.form.get("username") })
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
-            return apology("invalid username and/or password", 403)
+            return apology("Invalid username and/or password", 403)
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
