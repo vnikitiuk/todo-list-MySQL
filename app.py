@@ -68,7 +68,7 @@ def register():
 
         # Ensure username was submitted
         name = request.form.get("username")
-        if not name or len(execute_select("SELECT * FROM users WHERE username = %(username)s", { 'username': name })) > 0:
+        if not name or len(execute_select(mydb, "SELECT * FROM users WHERE username = %(username)s", { 'username': name })) > 0:
             return apology("Must provide username or such username exist", 400)
 
         # Ensure password has 8 symbols
