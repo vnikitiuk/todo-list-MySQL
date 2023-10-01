@@ -97,7 +97,7 @@ def register():
             return apology("Password must include numbers, lowercase and uppercase characters", 400)
 
         # Remember registrant
-        execute_insert_or_delete(mydb, "INSERT INTO users (username, hash) VALUES(%s, %s)", (name, generate_password_hash(password)))
+        execute_insert_or_delete(mydb, "INSERT INTO users (username, hash) VALUES(%s, %s)", (name, generate_password_hash(password, 'pbkdf2:sha1')))
 
         # Redirect user to home page
         return redirect("/")
